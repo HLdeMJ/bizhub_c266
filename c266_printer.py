@@ -1,23 +1,26 @@
 # C266打印机计数
 # Author: 2997@YBZN
 # -*- coding: utf-8 -*-
-from selenium import webdriver
-import datetime
-import time
-import locale
-import os
-import configparser
-import requests
-from lxml import etree
-from dingtalkchatbot.chatbot import DingtalkChatbot
 
 # 参考 https://www.jianshu.com/p/1531e12f8852
-# 览器驱动,放到python目录
+# 浏览器驱动,放到python目录
 # chrome
 # https://chromedriver.storage.googleapis.com/index.html
-
 # firefox
 # https://github.com/mozilla/geckodriver/releases
+# pip install selenium lxml requests DingtalkChatbot python-dateutil
+
+import os
+import time
+import locale
+import calendar
+import datetime
+import requests
+import configparser
+from lxml import etree
+from selenium import webdriver
+from dateutil.relativedelta import relativedelta
+from dingtalkchatbot.chatbot import DingtalkChatbot
 
 
 def get_printer_count(year, month, day, cycle, black_start_num, black_num, color_start_num, color_num):
@@ -44,12 +47,11 @@ def get_printer_count(year, month, day, cycle, black_start_num, black_num, color
     browser.quit()
 
     start_date = datetime.date(year, month, day)
-    #end_date = datetime.date(2021,12,31)
+    end_date = start_date + relativedelta(months = cycle) + datetime.timedelta(days=-1)
     current_date = datetime.date.today()
-    #black_start_num = 63029
-    #color_start_num = 7811
-    #black_num = 5000
-    #color_num = 300
+    if day == 1:
+        monthrange = '本月1日至本月' + str(calendar.monthrange(year, datetime.datetime.now().month)[1]) + '日'
+    else: monthrange = '本月' + str(day) + '日至下月' + str(day-1) + '日'
     delta = current_date - start_date
     count_cycle = delta.days // 30 + 1
     black_limit = black_start_num + black_num * count_cycle
@@ -58,12 +60,13 @@ def get_printer_count(year, month, day, cycle, black_start_num, black_num, color
     color_all_count = color_num * cycle
     black_color_all_count = black_start_num + \
         color_start_num + black_all_count + color_all_count
-    print(start_date)
-    print(current_date)
-    print(delta.days)
-    print('计数周期',count_cycle)
-    print(black_limit)
-    print(color_limit)
+        
+    print('开始时间', start_date)
+    print('结束时间', end_date)
+    print('当前时间', current_date)
+    print('使用实际', delta.days)
+    print('黑色可用', black_limit)
+    print('彩色可用', color_limit)
 
     black_count = int(str(list[104]))
     color_count = int(str(list[105]))
@@ -71,18 +74,18 @@ def get_printer_count(year, month, day, cycle, black_start_num, black_num, color
     locale.setlocale(locale.LC_CTYPE, 'chinese')
     print('\n', "柯尼卡美能C266打印统计", '\n', time.strftime('%Y年%m月%d日%H时%M分%S秒'), '\n', '总计', str(
         list[103]), '\n', '黑色', str(list[104]), '\n', '彩色', str(list[105]), '\n')
-    first_count = '本期结算数量' + ' ' + '截止2021年12月31日' + '\n' + '打印机计数范围内' + str(black_color_all_count) + '    黑色' + str(
+    first_count = '本期结算数量' + ' ' + '截止' + str(end_date) + '\n' + '打印机计数范围内' + str(black_color_all_count) + '    黑色' + str(
         black_start_num + black_all_count) + '    彩色' + str(color_start_num + color_all_count) + '\n'
     all_count = '当前数量统计  ' + time.strftime('%Y年%m月%d日%H时%M分') + '\n' + '当前使用计数' + str(
         list[103]) + '    ' + '黑色' + str(list[104]) + '    ' + '彩色' + str(list[105])
-    remainder1 = '本月剩余数量  ' + '本月1号至下月30号' + '\n' + '本月剩余总计' + str((black_limit-black_count) + (
+    remainder1 = '本月剩余数量  ' + monthrange + '\n' + '本月剩余总计' + str((black_limit-black_count) + (
         color_limit-color_count)) + '     ' + '黑色' + str(black_limit-black_count) + '     ' + '彩色' + str(color_limit-color_count)
-    remainder2 = '半年剩余数量  ' + '截止2021年12月31日' + '\n' + '半年剩余总计' + str(black_color_all_count - int(str(list[103]))) + '     ' + '黑色' + str(
+    remainder2 = '半年剩余数量  ' + '截止' + str(end_date) + '\n' + '半年剩余总计' + str(black_color_all_count - int(str(list[103]))) + '     ' + '黑色' + str(
         black_start_num + black_all_count - int(str(list[104]))) + '     ' + '彩色' + str(color_start_num + color_all_count - int(str(list[105])))
 
     print_all = '\n' + first_count + '\n' + all_count + \
         '\n\n' + remainder1 + '\n\n' + remainder2
-    print_lite = 'C266打印数本月剩余' + '\n黑色' + str(black_limit - black_count) + '\n彩色' + str(color_limit - color_count) + '\n' + '\n>>>>>>>>>>>>>>>>' + '\n截止2021年12月31日剩余' + '\n黑色' + str(
+    print_lite = 'C266打印数本月剩余' + monthrange + '\n黑色' + str(black_limit - black_count) + '\n彩色' + str(color_limit - color_count) + '\n' + '\n>>>>>>>>>>>>>>>>' + '\n截止' + str(end_date) + '剩余' + '\n黑色' + str(
         black_start_num + black_all_count - int(str(list[104]))) + '\n彩色' + str(color_start_num + color_all_count - int(str(list[105])))
     print(print_all)
     '''
