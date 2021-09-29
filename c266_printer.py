@@ -19,6 +19,7 @@ import requests
 import configparser
 from lxml import etree
 from selenium import webdriver
+from monthscalculation import calmonths
 from dateutil.relativedelta import relativedelta
 from dingtalkchatbot.chatbot import DingtalkChatbot
 
@@ -51,9 +52,11 @@ def get_printer_count(year, month, day, cycle, black_start_num, black_num, color
     current_date = datetime.date.today()
     if day == 1:
         monthrange = '本月1日至本月' + str(calendar.monthrange(year, datetime.datetime.now().month)[1]) + '日'
-    else: monthrange = '本月' + str(day) + '日至下月' + str(day-1) + '日'
+    else: 
+        monthrange = '本月' + str(day) + '日至下月' + str(day-1) + '日'
     delta = current_date - start_date
-    count_cycle = delta.days // 30 + 1
+    #count_cycle = datetime.datetime.now().month - month + 1
+    count_cycle = int(calmonths(start_date, current_date)[0]) + 1
     black_limit = black_start_num + black_num * count_cycle
     color_limit = color_start_num + color_num * count_cycle
     black_all_count = black_num * cycle
@@ -64,9 +67,9 @@ def get_printer_count(year, month, day, cycle, black_start_num, black_num, color
     print('开始时间', start_date)
     print('结束时间', end_date)
     print('当前时间', current_date)
-    print('使用实际', delta.days)
-    print('黑色可用', black_limit)
-    print('彩色可用', color_limit)
+    print('使用月数', count_cycle)
+    print('黑色限制', black_all_count)
+    print('彩色限制', color_all_count)
 
     black_count = int(str(list[104]))
     color_count = int(str(list[105]))
