@@ -55,7 +55,6 @@ def get_printer_count(year, month, day, cycle, black_start_num, black_num, color
     else: 
         monthrange = '本月' + str(day) + '日至下月' + str(day-1) + '日'
     delta = current_date - start_date
-    #count_cycle = datetime.datetime.now().month - month + 1
     count_cycle = int(calmonths(start_date, current_date)[0]) + 1
     black_limit = black_start_num + black_num * count_cycle
     color_limit = color_start_num + color_num * count_cycle
