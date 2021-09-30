@@ -88,7 +88,7 @@ def get_printer_count(year, month, day, cycle, black_start_num, black_num, color
 
     print_all = '\n' + first_count + '\n' + all_count + \
         '\n\n' + remainder1 + '\n\n' + remainder2
-    print_lite = 'C266打印数本月剩余' + monthrange + '\n黑色' + str(black_limit - black_count) + '\n彩色' + str(color_limit - color_count) + '\n' + '\n>>>>>>>>>>>>>>>>' + '\n截止' + str(end_date) + '剩余' + '\n黑色' + str(
+    print_lite = 'C266打印数本月剩余\n' + monthrange + '\n黑色' + str(black_limit - black_count) + '\n彩色' + str(color_limit - color_count) + '\n' + '\n>>>>>>>>>>>>>>>>' + '\n截止' + str(end_date) + '剩余' + '\n黑色' + str(
         black_start_num + black_all_count - int(str(list[104]))) + '\n彩色' + str(color_start_num + color_all_count - int(str(list[105])))
     print(print_all)
     '''
